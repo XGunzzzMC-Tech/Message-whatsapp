@@ -1,0 +1,98 @@
+ <!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Message To Telegram</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <main>
+            <section id="contact" class="card">
+<div class="container">
+    <h2>Anonimus Message</h2>
+    <form id="contactForm">
+        <label for="name">Username:</label>
+        <input type="text" id="name" name="name" placeholder="Contoh: Bebas (required)" required>
+
+        <label for="number">Objective:</label>
+        <input type="number" id="number" name="number" placeholder="Contoh: 6890528297 (required)" required>
+
+        <label for="message">Message:</label>
+        <textarea id="message" name="message" rows="4" placeholder="Tulis pesan Anda di sini... (required)" required></textarea>
+        
+                <input type="submit" target="_blank" value="Kirim Pesan" class="btn">
+    </form>
+     <div id="notification" class="notification"></div>
+</div>
+
+<script type="module">
+    import botConfig from './setting.js';  // Mengimpor setting.js
+
+    document.getElementById("contactForm").addEventListener("submit", function(event){
+        event.preventDefault();
+
+        var name = document.getElementById("name").value;
+        var number = document.getElementById("number").value;
+        var message = document.getElementById("message").value;
+
+        var currentDate = new Date();
+        var date = currentDate.toLocaleDateString();
+        var time = currentDate.toLocaleTimeString();
+
+        var messageText = `New Message From: ${name}\n================\n\n• Name: ${name}\n• Message: ${message}\n• Sent On: ${date} at ${time}\n\n================\n© Anonymus Message`;
+
+        var apiUrl = `https://api.telegram.org/bot${botConfig.botToken}/sendMessage?chat_id=${number}&text=${encodeURIComponent(messageText)}`;
+
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                var notification = document.getElementById("notification");
+                if (data.ok) {
+                    notification.className = "notification success";
+                    notification.innerHTML = "Pesan berhasil dikirim! ✅";
+                } else {
+                    notification.className = "notification error";
+                    notification.innerHTML = "Terjadi kesalahan, coba lagi ⚠️";
+                }
+                notification.style.display = "block";
+                setTimeout(function(){
+                    notification.style.display = "none";
+                }, 3000);
+            })
+            .catch(error => {
+                var notification = document.getElementById("notification");
+                notification.className = "notification error";
+                notification.innerHTML = "Terjadi kesalahan: " + error + " ⚠️";
+                notification.style.display = "block";
+                setTimeout(function(){
+                    notification.style.display = "none";
+                }, 3000);
+            });
+    });
+                
+        // Menampilkan notifikasi
+function showNotification(message, type) {
+    var notification = document.getElementById("notification");
+    notification.className = "notification " + type;
+    notification.innerHTML = message;
+    notification.style.display = "block";
+
+    // Menyembunyikan pemberitahuan setelah 3 detik
+    setTimeout(function(){
+        notification.style.display = "none";
+    }, 3000);
+}
+    document.getElementById("exitButton").addEventListener("click", function() {
+        window.close();
+    });
+</script>
+            </section>
+            
+        </div>
+    </main>
+
+</body>
+</html>
